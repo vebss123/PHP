@@ -12,7 +12,7 @@ jobs:
       PROJECT_ID: ${{ secrets.GCP_PROJECT }}
       SERVICE_NAME: ${{ secrets.CLOUD_RUN_SERVICE }}
       REGION: ${{ secrets.GCP_REGION }}
-      IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.CLOUD_RUN_SERVICE }}:${{ github.sha }}
+      IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.CLOUD_RUN_SERVICE }}
 
     steps:
       - name: Checkout code
