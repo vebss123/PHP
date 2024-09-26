@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 on:
   push:
     branches:
-      - main  # Change to your default branch
+      - main  # Change to your default branch if necessary
 
 jobs:
   build-and-deploy:
@@ -12,7 +12,8 @@ jobs:
       PROJECT_ID: ${{ secrets.GCP_PROJECT }}
       SERVICE_NAME: ${{ secrets.CLOUD_RUN_SERVICE }}
       REGION: ${{ secrets.GCP_REGION }}
-      IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.CLOUD_RUN_SERVICE }}
+      REPOSITORY: my-repo  # Replace with your repository name
+      IMAGE: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ secrets.CLOUD_RUN_SERVICE }}:${{ github.sha }}
 
     steps:
       - name: Checkout code
@@ -25,8 +26,8 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           export_default_credentials: true
 
-      - name: Configure Docker for GCR
-        run: gcloud auth configure-docker --quiet
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
       - name: Build Docker image
         run: docker build -t ${{ env.IMAGE }} .
