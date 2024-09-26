@@ -6,7 +6,7 @@
     <title>Simple PHP Webpage</title>
 </head>
 <body>
-    <h1>Welcome to My PHP Webpage abhinav</h1>
+    <h1>Welcome to My PHP Webpage abhinav1</h1>
     <p>This is a simple PHP webpage.</p>
     <?php
         // PHP code here
