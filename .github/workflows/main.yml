@@ -5,15 +5,14 @@ on:
     branches:
       - main  # Change to your default branch
 
-env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-  SERVICE_NAME: ${{ secrets.CLOUD_RUN_SERVICE }}
-  REGION: ${{ secrets.GCP_REGION }}
-  IMAGE: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.ref_name }}
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+      SERVICE_NAME: ${{ secrets.CLOUD_RUN_SERVICE }}
+      REGION: ${{ secrets.GCP_REGION }}
+      IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.CLOUD_RUN_SERVICE }}:${{ github.sha }}
 
     steps:
       - name: Checkout code
