@@ -12,8 +12,8 @@ jobs:
       PROJECT_ID: ${{ secrets.GCP_PROJECT }}
       SERVICE_NAME: ${{ secrets.CLOUD_RUN_SERVICE }}
       REGION: ${{ secrets.GCP_REGION }}
-      REPOSITORY: my-repo  # Replace with your repository name
-      IMAGE: ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ secrets.CLOUD_RUN_SERVICE }}:${{ github.sha }}
+      REPOSITORY: gen-ai-poc  # Replace with your repository name
+      IMAGE: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}'
 
     steps:
       - name: Checkout code
