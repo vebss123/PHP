@@ -1,53 +1,29 @@
-name: Deploy to Cloud Run
+steps:
+- id: "Build Docker Image"
+  name: 'gcr.io/cloud-builders/docker:latest'
+  args: ['build', '-t', 'us-central1-docker.pkg.dev/ankercloud-testing-account/gen-ai-poc/ai-poc', '.']
 
-on:
-  push:
-    branches:
-      - main  # Change to your default branch if necessary
+- id: "Push Docker Image To Artifact Registry"
+  name: 'gcr.io/cloud-builders/docker:latest'
+  args: ['push', '--all-tags', 'us-central1-docker.pkg.dev/ankercloud-testing-account/gen-ai-poc/ai-poc']
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    env:
-      PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-      SERVICE_NAME: ${{ secrets.CLOUD_RUN_SERVICE }}
-      REGION: ${{ secrets.GCP_REGION }}
-      REPOSITORY: gen-ai-poc  # Replace with your repository name
+- id: "Deploy Cloud Run Service"
+  name: 'gcr.io/cloud-builders/gcloud:latest'
+  args: [
+    'run', 'deploy', 'qr-fe', 
+    '--service-account', '263666966446-compute@developer.gserviceaccount.com',
+    '--allow-unauthenticated',
+    '--memory', '1024Mi',
+    '--platform', 'managed',
+    '--image', 'us-central1-docker.pkg.dev/ankercloud-testing-account/gen-ai-poc/ai-poc:latest',
+    '--timeout', '30',
+    '--min-instances', '0',
+    '--max-instances', '1',
+    '--ingress', 'all',
+    '--region', 'us-central1'
+  ]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ env.PROJECT_ID }}
-          export_default_credentials: true
-
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
-      
-          
-      - name: Build Docker image
-        run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
-          echo $IMAGE
-          docker build -t $IMAGE .
-         
-
-
-      - name: Push Docker image
-        run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
-          docker push $IMAGE
-
-      - name: Deploy to Cloud Run
-        run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image $IMAGE \
-            --region ${{ env.REGION }} \
-            --platform managed \
-            --allow-unauthenticated \
-            --quiet
+timeout: 600s
+options:
+  logging: CLOUD_LOGGING_ONLY
+  dynamic_substitutions: true
