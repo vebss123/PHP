@@ -49,5 +49,4 @@ jobs:
           --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.APP_NAME }}:${{ github.sha }} \
           --platform "managed" \
           --service-account ${{ env.SERVICE_ACCOUNT_EMAIL }} \
-          --port 8080 \
           --quiet
