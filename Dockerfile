@@ -19,4 +19,5 @@ EXPOSE 8080
 #ENV PORT 8080
 
 # Run the application, using the PORT environment variable set by Cloud Run
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=True)
+
