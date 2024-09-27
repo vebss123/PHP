@@ -1,21 +1,14 @@
+# .github/workflows/cloud-run-deploy.yml
+
 name: Build and Deploy to Cloud Run
 
 on:
   push:
     branches:
       - main  # Adjust the branch as needed
-  workflow_dispatch:
-
-env:
-  PROJECT_ID: ankercloud-testing-account
-  REGION: us-central1
-  APP_NAME: php-app
-  REGISTRY_NAME: gen-ai-poc
-  SERVICE_ACCOUNT_EMAIL: 263666966446-compute@developer.gserviceaccount.com
 
 jobs:
   build-and-deploy:
-    name: Setup, Build, and Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -23,45 +16,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Authenticate with Google Cloud
-      - id: "auth"
-        uses: google-github-actions/auth@v1.1.1
-        with:
-          credentials_json: "${{ secrets.GCP_SA_KEY }}"
-
-      # Setup gcloud CLI/SDK
-      - name: Set up Cloud SDK
+      # Setup gcloud CLI
+      - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ankercloud-testing-account
           export_default_credentials: true
 
       # Configure Docker to use gcloud as a credential helper
       - name: Configure Docker authentication
-        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       # Build the Docker image
       - name: Build Docker Image
         run: |
-          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.APP_NAME }}:${{ github.sha }} .
+          docker build -t us-central1-docker.pkg.dev/ankercloud-testing-account/gen-ai-poc/php-app .
 
       # Push the Docker image to Artifact Registry
       - name: Push Docker Image to Artifact Registry
         run: |
-          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.APP_NAME }}:${{ github.sha }}
+          docker push us-central1-docker.pkg.dev/ankercloud-testing-account/gen-ai-poc/php-app
 
       # Deploy the Docker image to Cloud Run
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.APP_NAME }} \
-            --service-account ${{ env.SERVICE_ACCOUNT_EMAIL }} \
+          gcloud run deploy php-app \
+            --service-account 263666966446-compute@developer.gserviceaccount.com \
             --allow-unauthenticated \
             --memory 1024Mi \
             --platform managed \
-            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.APP_NAME }}:${{ github.sha }} \
+            --image us-central1-docker.pkg.dev/ankercloud-testing-account/gen-ai-poc/php-app:latest \
             --timeout 30 \
             --min-instances 0 \
             --max-instances 1 \
             --ingress all \
-            --region ${{ env.REGION }} \
-            --quiet
+            --region us-central1
