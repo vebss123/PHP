@@ -12,8 +12,11 @@ RUN pip install -r requirements.txt
 # Copy application code
 COPY . .
 
-# Expose port 5000
+# Expose port 8080
 EXPOSE 8080
 
-# Run the application
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+# Use environment variable PORT, with a fallback to 8080 if not defined
+ENV PORT 8080
+
+# Run the application, using the PORT environment variable set by Cloud Run
+CMD ["flask", "run", "--host=0.0.0.0", "--port", "${PORT}"]
