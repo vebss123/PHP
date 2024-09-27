@@ -1,5 +1,5 @@
-# app.py
 from flask import Flask, render_template, request, redirect, url_for
+import os
 
 app = Flask(__name__)
 
@@ -19,7 +19,10 @@ def login():
 
 @app.route('/welcome/<username>')
 def welcome(username):
-    return f'Welcome Back, {username hello}!'
+    return f'Welcome Back, {username}!'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Use PORT environment variable, default to 8080 if not set
+    port = int(os.environ.get('PORT', 8080))
+    # Run the application on host 0.0.0.0 and the specified port
+    app.run(host='0.0.0.0', port=port)
