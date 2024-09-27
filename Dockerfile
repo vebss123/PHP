@@ -1,14 +1,19 @@
-# Use the official PHP Apache image
-FROM php:8.0-apache
+FROM python:3.9-slim
 
-# Copy source code to the container
-COPY . /var/www/html/
+# Set working directory
+WORKDIR /app
 
-# Install dependencies if necessary
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+# Copy requirements file
+COPY requirements.txt .
 
-# Expose port 8080
-EXPOSE 8080
+# Install dependencies
+RUN pip install -r requirements.txt
 
-# Start Apache server
-CMD ["apache2-foreground"]
+# Copy application code
+COPY . .
+
+# Expose port 5000
+EXPOSE 5000
+
+# Run the application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
