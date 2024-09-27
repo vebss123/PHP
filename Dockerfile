@@ -1,25 +1,18 @@
-FROM python:3.9-slim
+# Use the official Python image from the Docker Hub
+FROM python:3.11-slim
 
-# Set working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy requirements file
-COPY requirements.txt .
+# Copy the requirements.txt file and install dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies
-RUN pip install -r requirements.txt
+# Copy the Flask app code into the container
+COPY app.py ./
 
-# Copy application code
-COPY . .
-
-# Expose port 8080
+# Expose port 8080 (Cloud Run expects your app to listen on this port)
 EXPOSE 8080
 
-# Use environment variable PORT, with a fallback to 8080 if not defined
-#ENV PORT 8080
-
-# Run the application, using the PORT environment variable set by Cloud Run
-CMD ["python","app.py"]
-
-
-
+# Command to run the app
+CMD ["python", "app.py"]
