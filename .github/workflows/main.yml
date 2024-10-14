@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: ankercloud-testing-account
+  PROJECT_ID: testing-account
   REGION: us-central1  
   SERVICE_NAME: deploy-genai-cloudrun
   IMAGE_NAME: test-application
