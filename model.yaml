@@ -11,9 +11,6 @@ from vertexai.generative_models import GenerationConfig, GenerativeModel, Part
 import vertexai.preview.generative_models as generative_models
 import re
 
-
-
-
 # Headers without authentication (no GitHub token required)
 headers = {
     'Accept': 'application/vnd.github.v3+json'
